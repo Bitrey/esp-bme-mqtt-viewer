@@ -1,8 +1,8 @@
 const state = {
   dataReads: [],
   socket: null,
-  fromDate: new Date("01/01/1970"),
-  toDate: new Date("01/01/2100"),
+  fromDate: dateFns.subDays(new Date(), 2),
+  toDate: dateFns.addDays(new Date(), 2),
   maxResults: 100
 };
 
