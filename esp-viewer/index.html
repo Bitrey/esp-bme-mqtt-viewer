@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Amella IoT</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css"
+    />
+    <link rel="stylesheet" href="/css/index.css" />
+    <link
+      href="https://unpkg.com/gridjs/dist/theme/mermaid.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bulma-calendar@6.1.17/dist/css/bulma-calendar.min.css"
+      integrity="sha256-K8evbcx+RuWxBsBduNHurtdj6LO/Utc5/wH6298Q5Ug="
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="/css/bulma-slider.min.css" />
+  </head>
+  <body>
+    <nav
+      class="navbar mb-5 is-link"
+      role="navigation"
+      aria-label="main navigation"
+    >
+      <div class="navbar-brand">
+        <a class="navbar-item">
+          <h1>Amella IoT</h1>
+        </a>
+
+        <a
+          role="button"
+          class="navbar-burger"
+          aria-label="menu"
+          aria-expanded="false"
+          data-target="mainNavbar"
+        >
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+        </a>
+      </div>
+
+      <div id="mainNavbar" class="navbar-menu">
+        <div class="navbar-end">
+          <div class="navbar-item">
+            <p id="status">Caricamento...</p>
+          </div>
+        </div>
+      </div>
+    </nav>
+    <section class="section" style="min-height: 100vh; padding-top: 2rem">
+      <div class="container">
+        <div class="box">
+          <div
+            id="loading"
+            style="
+              width: 100%;
+              min-height: 5rem;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+            "
+          >
+            <svg class="spinner" viewBox="0 0 50 50">
+              <circle
+                class="path"
+                cx="25"
+                cy="25"
+                r="20"
+                fill="none"
+                stroke-width="5"
+              ></circle>
+            </svg>
+          </div>
+
+          <div id="data" style="display: none" class="px-3 py-2">
+            <h1>Opzioni</h1>
+            <div class="mb-5">
+              <div class="field">
+                <label class="label">Intervallo date</label>
+                <div
+                  style="display: flex; overflow-x: auto; overflow-y: clip"
+                  id="date-interval-container"
+                >
+                  <div style="width: 100%">
+                    <input type="date" id="date-picker" />
+                  </div>
+                  <div class="mx-3" style="width: 100%">
+                    <input type="date" id="time-picker" />
+                  </div>
+                  <button class="button" id="reload-btn" disabled>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        fill="#4a4a4a"
+                        d="M9 12l-4.463 4.969-4.537-4.969h3c0-4.97 4.03-9 9-9 2.395 0 4.565.942 6.179 2.468l-2.004 2.231c-1.081-1.05-2.553-1.699-4.175-1.699-3.309 0-6 2.691-6 6h3zm10.463-4.969l-4.463 4.969h3c0 3.309-2.691 6-6 6-1.623 0-3.094-.65-4.175-1.699l-2.004 2.231c1.613 1.526 3.784 2.468 6.179 2.468 4.97 0 9-4.03 9-9h3l-4.537-4.969z"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              <div class="field">
+                <label class="label mb-0 mt-3">Risultati massimi</label>
+                <input
+                  class="slider is-fullwidth has-output"
+                  step="1"
+                  min="10"
+                  max="999"
+                  value="100"
+                  type="range"
+                  id="max-results-slider"
+                />
+                <output for="max-results-slider">100</output>
+              </div>
+            </div>
+
+            <h1>Grafici</h1>
+            <p
+              class="mb-3"
+              style="text-align: center; font-weight: 300; font-size: 0.9rem"
+            >
+              Puoi zoomare usando CTRL + mouse
+            </p>
+            <div style="max-width: 80vw">
+              <canvas id="temp-chart" height="100"></canvas>
+              <canvas id="hum-chart" height="100"></canvas>
+              <canvas id="pres-chart" height="100"></canvas>
+            </div>
+
+            <div
+              style="
+                display: flex;
+                align-items: center;
+                justify-content: center;
+              "
+            >
+              <h1 class="mb-3">Tabella</h1>
+            </div>
+            <div>
+              <div id="render-grid" class="mt-3 mx-auto"></div>
+            </div>
+            <div class="mt-3" style="display: flex; justify-content: center">
+              <button id="csv-export-btn" class="button is-link is-medium mr-1">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    fill="white"
+                    d="M19.479 10.092c-.212-3.951-3.473-7.092-7.479-7.092-4.005 0-7.267 3.141-7.479 7.092-2.57.463-4.521 2.706-4.521 5.408 0 3.037 2.463 5.5 5.5 5.5h13c3.037 0 5.5-2.463 5.5-5.5 0-2.702-1.951-4.945-4.521-5.408zm-7.479 6.908l-4-4h3v-4h2v4h3l-4 4z"
+                  />
+                </svg>
+                <span class="ml-2">Esporta dati attuali CSV</span>
+              </button>
+              <a
+                id="excel-export-btn"
+                class="button is-link is-medium ml-1"
+                href="/api/xlsx"
+                target="_blank"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    fill="white"
+                    d="M19.479 10.092c-.212-3.951-3.473-7.092-7.479-7.092-4.005 0-7.267 3.141-7.479 7.092-2.57.463-4.521 2.706-4.521 5.408 0 3.037 2.463 5.5 5.5 5.5h13c3.037 0 5.5-2.463 5.5-5.5 0-2.702-1.951-4.945-4.521-5.408zm-7.479 6.908l-4-4h3v-4h2v4h3l-4 4z"
+                  />
+                </svg>
+                <span class="ml-2">Esporta tutto in Excel</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Axios -->
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.26.1/axios.min.js"
+      integrity="sha512-bPh3uwgU5qEMipS/VOmRqynnMXGGSRv+72H/N260MQeXZIK4PG48401Bsby9Nq5P5fz7hy5UGNmC/W1Z51h2GQ=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+      defer
+    ></script>
+    <!-- Socket.io -->
+    <script
+      src="https://cdn.socket.io/4.4.1/socket.io.min.js"
+      integrity="sha384-fKnu0iswBIqkjxrhQCTZ7qlLHOFEgNkRmK2vaO/LbTZSXdJfAu6ewRBdwHPhBo/H"
+      crossorigin="anonymous"
+      defer
+    ></script>
+    <!-- Chart.js -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"
+      integrity="sha256-ErZ09KkZnzjpqcane4SCyyHsKAXMvID9/xwbl/Aq1pc="
+      crossorigin="anonymous"
+      defer
+    ></script>
+    <!-- Date-fns -->
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/date-fns/1.30.1/date_fns.min.js"
+      integrity="sha512-F+u8eWHrfY8Xw9BLzZ8rG/0wIvs0y+JyRJrXjp3VjtFPylAEEGwKbua5Ip/oiVhaTDaDs4eU2Xtsxjs/9ag2bQ=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+      defer
+    ></script>
+    <!-- Chart date-fns adapter -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@2.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"
+      integrity="sha256-xlxh4PaMDyZ72hWQ7f/37oYI0E2PrBbtzi1yhvnG+/E="
+      crossorigin="anonymous"
+      defer
+    ></script>
+    <!-- Grid.js -->
+    <script type="module" defer>
+      import { Grid, html } from "https://unpkg.com/gridjs?module";
+      window.Grid = Grid;
+      window.html = html;
+    </script>
+    <!-- Bulma Calendar -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/bulma-calendar@6.1.17/dist/js/bulma-calendar.min.js"
+      integrity="sha256-45iKbUwfs+/7NbU3+j4opEShOPmuhdThgxC+z5kK7II="
+      crossorigin="anonymous"
+      defer
+    ></script>
+    <!-- Hammer.js (necessary for zoom) -->
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"
+      integrity="sha512-UXumZrZNiOwnTcZSHLOfcTs0aos2MzBWHXOHOuB0J/R44QB0dwY5JgfbvljXcklVf65Gc4El6RjZ+lnwd2az2g=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+      defer
+    ></script>
+    <!-- Chart.js zoom -->
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/1.2.0/chartjs-plugin-zoom.min.js"
+      integrity="sha512-TT0wAMqqtjXVzpc48sI0G84rBP+oTkBZPgeRYIOVRGUdwJsyS3WPipsNh///ay2LJ+onCM23tipnz6EvEy2/UA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+      defer
+    ></script>
+    <!-- Bulma Slider -->
+    <script
+      src="/js/bulma-slider.min.js"
+      integrity="sha512-WLKXHCsMXTSIPsmQShJRE6K4IzwvNkhwxr/Oo8N3z+kzjhGleHibspmWLTawNMdl2z9E23XK20+yvUTDZ+zeNQ=="
+      crossorigin="anonymous"
+      defer
+    ></script>
+
+    <!-- Custom script -->
+    <script type="module" src="/js/index.js" defer></script>
+  </body>
+</html>

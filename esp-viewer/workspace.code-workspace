@@ -1,0 +1,16 @@
+{
+    "folders": [
+		{
+			"path": "."
+		},
+		{
+			"name": "esp32-iot-amella",
+			"path": "..\\..\\PlatformIO\\Projects\\esp32-iot-amella"
+		}
+	],
+    "settings": {
+        "files.associations": {
+            "ostream": "cpp"
+        }
+    }
+}

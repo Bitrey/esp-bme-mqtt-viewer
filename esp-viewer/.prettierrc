@@ -1,0 +1,15 @@
+{
+    "trailingComma": "none",
+    "tabWidth": 4,
+    "printWidth": 80,
+    "semi": true,
+    "singleQuote": false,
+    "jsxSingleQuote": false,
+    "arrowParens": "avoid",
+    "htmlWhitespaceSensitivity": "ignore",
+    "endOfLine": "lf",
+    "importOrder": ["@config[/(.*)]*$", "^@.*[/(.*)]*$", "^[./]"],
+    "importOrderSeparation": true,
+    "importOrderSortSpecifiers": true,
+    "overrides": [{ "files": ["*.html", "*.js"], "options": { "tabWidth": 2 } }]
+}
